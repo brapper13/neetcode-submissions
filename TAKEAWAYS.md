@@ -120,6 +120,24 @@ Seen in:
   is the start-of-sequence gate, [lines 26–28](Data%20Structures%20&%20Algorithms/longest-consecutive-sequence/submission-9.go#L26-L28)
   the upward walk.
 
+### 16. Normalize each element as you read it, not the whole input up front
+
+`strings.ToLower(s)` builds a second string — O(n) extra space spent before
+the real work starts. But indexing a string hands you a *copy* of one byte,
+and the copy is yours to change even though the string is immutable. If the
+algorithm only ever looks at one or two elements at a time, transform them
+at read time and no transformed copy of the input ever needs to exist.
+
+Seen in:
+- **[Valid Palindrome](Data%20Structures%20&%20Algorithms/is-palindrome/STATEMENT.md)** — ignoring case
+  and punctuation, does the string read the same both ways?
+  → [is-palindrome/submission-13.go, lines 14 and 23–28](Data%20Structures%20&%20Algorithms/is-palindrome/submission-13.go#L14):
+  lowercasing applied to the two bytes being compared. Contrast
+  [submission-3.go, lines 5–14](Data%20Structures%20&%20Algorithms/is-palindrome/submission-3.go#L5-L14),
+  which built a full cleaned copy first.
+
+Related background: [go-notes/strings.md](go-notes/strings.md).
+
 ## Go semantics
 
 ### 7. Comma-ok when zero could be real data, direct indexing when it cannot
@@ -237,3 +255,21 @@ paste to the judge (the full checklist is in [PLAYBOOK.md](PLAYBOOK.md)).
 The standing counterexample:
 [anagram-groups/submission-4.go, lines 14–42](Data%20Structures%20&%20Algorithms/anagram-groups/submission-4.go#L14-L42)
 carries 29 lines of commented-out old attempt that went to the judge.
+
+### 17. An accepted submission is not a correct program
+
+The judge runs a finite test set. Submission-11 of Valid Palindrome was
+accepted while returning `true` for `"@@@@axya"`, whose cleaned form
+`"axya"` is not a palindrome — the tests simply never front-load junk
+characters. A green tick means "passed these cases", nothing more.
+
+After acceptance, attack your own boundary logic with inputs the tests
+might not have: everything-is-skippable, junk skewed to one side, empty
+after cleaning, single element. Skip-and-walk code earns this scrutiny
+every time.
+
+Seen in:
+- **[Valid Palindrome](Data%20Structures%20&%20Algorithms/is-palindrome/STATEMENT.md)** — the accepted
+  bug was the loop bound at
+  [is-palindrome/submission-11.go, line 8](Data%20Structures%20&%20Algorithms/is-palindrome/submission-11.go#L8);
+  the story is in [the NOTES](Data%20Structures%20&%20Algorithms/is-palindrome/NOTES.md).

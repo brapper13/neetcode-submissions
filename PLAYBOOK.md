@@ -47,6 +47,15 @@ is absent (`!set[x-1]`), then walk upward while successors exist. Iterate
 the set, not the input, or duplicates break the O(n) argument.
 ([Takeaway 6](TAKEAWAYS.md#6-count-what-your-loop-actually-iterates).)
 
+**"Does it read the same from both ends?" / "compare mirrored positions."**
+Two pointers: `i` from the front, `j` from the back, `for i < j`. Skip
+elements that don't count with bounds-guarded inner loops — guard first,
+then index: `for i < j && !valid(s[i])`. Compare normalized elements, then
+step both pointers inward. The pointers themselves are the loop state, so
+the exit condition is `i < j`, never a precomputed midpoint —
+([takeaway 17](TAKEAWAYS.md#17-an-accepted-submission-is-not-a-correct-program)
+is what happens otherwise).
+
 **"Pack arbitrary data into one string and get it back exactly."**
 Write each piece's length in front of it, and read lengths at known
 positions when decoding. Never search the data for a marker — the data can
@@ -83,6 +92,12 @@ contain the marker.
 | int → string | `strconv.Itoa(n)` | not Sprintf |
 | 0..25 index → letter | `byte('a' + i)` | same trick, reversed |
 | int digit → char | `byte('0' + d)` | |
+| uppercase → lowercase byte | `b + 'a' - 'A'`, guarded by `'A' <= b && b <= 'Z'` | same offset trick; the cases sit 32 apart |
+
+There is no `isalnum` for bytes in the stdlib — write the range checks
+yourself (`'a' <= b && b <= 'z' || ...`) and put them in a named helper.
+For building strings incrementally, `strings.Builder` (`WriteByte`,
+`WriteString`, then `String()`) — `+=` on a string recopies it every time.
 
 `s[i]` gives a byte. `range s` gives runes. The subtraction trick works on
 either, but only under an ASCII constraint — state the constraint.
