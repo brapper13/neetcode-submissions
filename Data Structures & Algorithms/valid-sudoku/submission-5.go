@@ -1,0 +1,52 @@
+func isValidSudoku(board [][]byte) bool {
+	// check rows
+	for i := 0; i < len(board); i++ {
+		var rowDups [9]int
+		for j := 0; j < len(board[0]); j++ {
+			if board[i][j] == '.' {
+				continue
+			}
+			if rowDups[int(board[i][j]-'0')-1] > 0 {
+				return false
+			}
+			rowDups[int(board[i][j]-'0')-1]++
+		}
+	}
+	// check column
+	for i := 0; i < len(board); i++ {
+		var colDups [9]int
+		for j := 0; j < len(board[0]); j++ {
+			if board[j][i] == '.' {
+				continue
+			}
+			if colDups[int(board[j][i]-'0')-1] > 0 {
+				return false
+			}
+			colDups[int(board[j][i]-'0')-1]++
+		}
+	}
+	
+	// check sub-box
+	var startRow int
+	var startColumn int
+	for startRow < len(board) {
+		var boxDups [9]int
+		for i := startRow; i < startRow+3; i++ {
+			for j := startColumn; j < startColumn+3; j++ {
+				if board[i][j] == '.' {
+					continue
+				}
+				if boxDups[int(board[i][j]-'0')-1] > 0 {
+					return false
+				}
+				boxDups[int(board[i][j]-'0')-1]++
+			}
+		}
+		startColumn += 3
+		if startColumn >= len(board) {
+			startColumn = 0
+			startRow+=3
+		}
+	}
+	return true
+}
