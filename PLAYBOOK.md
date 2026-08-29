@@ -1,7 +1,8 @@
 # Problem playbook — Arrays & Hashing
 
 Built from the nine problems of the first block. Covers only techniques
-already used. Re-read before timed sessions.
+already used. Re-read after timed sessions, not right before them — timed runs
+are done cold so the numbers mean something.
 
 ## The ritual
 

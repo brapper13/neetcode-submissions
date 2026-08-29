@@ -6,7 +6,9 @@ the exact lines of code. Each problem name links to a STATEMENT.md in its
 folder with the full problem description, an example, and the constraints
 — so you can re-anchor without opening NeetCode.
 
-Re-read this before the block do-over and before any timed session.
+Re-read this after each timed session, against what you just did —
+not right before one, or the timing measures short-term memory
+instead of what stuck.
 
 ## Patterns
 
