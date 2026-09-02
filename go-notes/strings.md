@@ -47,6 +47,40 @@ Browsers compared names as C strings, stopped at the zero byte, and saw
 The same principle drove the encode/decode problem: length-prefix framing
 (out-of-band) is safe, searching the data for a marker (in-band) is not.
 
+## Why strings are immutable
+
+Four reasons, and they reinforce each other.
+
+**Sharing instead of copying.** A string is a pointer-and-length header.
+Assignment, argument passing, and slicing copy just the header, so both
+copies point at the same bytes. That is safe only because nobody can
+write through either one. Mutable strings would make `b := a` create
+aliased mutable data, and every careful program would defensively copy —
+which is what C++ code does with `std::string`. Substrings ride the same
+guarantee: `s[2:5]` is a new header into the same array, no allocation.
+
+**Map keys.** A map hashes a key's bytes on insert and files the entry
+by that hash. If the bytes could change afterwards, the entry would sit
+under a hash that no longer matches it — unfindable, invariant broken.
+Same argument as why slices can't be keys (see [[map-keys]]). Strings
+are the workhorse key because they are frozen.
+
+**Concurrency.** Immutable data needs no locks. Any number of goroutines
+can read the same string with no synchronisation and no possible race.
+
+**Compile-time value.** Literals live deduplicated in the binary's
+read-only segment, and `const` strings can exist, because a string's
+value can be fixed before the program runs.
+
+The toll is paid at one border: `[]byte` is mutable, so
+`string(bs)` and `[]byte(s)` must copy. Builder's `String()` skips that
+copy only by promising never to touch its buffer again — immutability
+held by contract instead.
+
+Java, Python, and C# made the same choice for the same reasons. C is
+the outlier, and shared mutable `char*` buffers are behind a good share
+of its historical bugs.
+
 ## Bytes and runes
 
 `s[i]` indexes raw bytes. `range s` decodes UTF-8 and yields runes.
