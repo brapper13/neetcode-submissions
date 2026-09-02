@@ -1,4 +1,10 @@
+import (
+	"fmt"
+	"strconv"
+)
+
 type Solution struct{}
+
 // we're using ascii characters, 256 of them.
 // string can be 200 chars
 // array can be empty
@@ -25,8 +31,8 @@ func (s *Solution) Decode(encoded string) []string {
 		j++
 		// get length of string
 		// i was using a strings.Builder before.
-		length, _ := strconv.Atoi(encoded[j:j+digits])
-		j+=digits
+		length, _ := strconv.Atoi(encoded[j : j+digits])
+		j += digits
 		output = append(output, encoded[j:j+length])
 		i = j + length
 	}
