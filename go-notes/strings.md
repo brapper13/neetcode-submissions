@@ -53,3 +53,28 @@ The same principle drove the encode/decode problem: length-prefix framing
 `len(s)` counts bytes, not characters. Byte indexing and the `x - 'a'`
 arithmetic are correct only under an ASCII constraint — state it when you
 use them.
+
+## Building strings without quadratic copies
+
+`out += piece` in a loop reallocates and copies the whole string every
+iteration — O(n²) total. `strings.Builder` keeps one growable buffer, so
+appending is amortised O(1). Build with `WriteString` and `WriteByte`,
+call `String()` once at the end.
+
+`*strings.Builder` implements `io.Writer` (it has a
+`Write([]byte) (int, error)` method). That is why `fmt.Fprintf(&sb, ...)`
+works: the whole `Fprint` family targets any `io.Writer` — a file, a
+socket, an HTTP response, or a builder.
+
+Pick the cheapest form that does the job:
+
+1. `sb.WriteString(s)` / `sb.WriteByte(b)` when the pieces already exist.
+   Fastest — no format parsing, no reflection.
+2. `fmt.Fprintf(&sb, "%d#", n)` when you genuinely need formatting.
+   It writes straight into the builder's buffer.
+3. `sb.WriteString(fmt.Sprintf(...))` — never. It pays for `fmt` and
+   then copies the result a second time. This exact shape is what
+   staticcheck QF1012 ("Use fmt.Fprintf instead of WriteString") flags.
+
+For a number followed by a delimiter, `strconv.Itoa(n)` plus
+`WriteByte('#')` beats both `fmt` forms.
