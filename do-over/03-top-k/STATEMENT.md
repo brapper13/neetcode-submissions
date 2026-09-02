@@ -19,3 +19,7 @@ Output: [2, 3]
 
 **Target:** O(n) via frequency buckets — a frequency can never exceed
 `len(nums)`, so an array of `len(nums)+1` buckets replaces sorting.
+
+### Result
+Completed. Took 15:16:73. 
+I actually had the right answer but due to a silly go mistake spent a lot of time debugging. did for item := range array instead of for _, item

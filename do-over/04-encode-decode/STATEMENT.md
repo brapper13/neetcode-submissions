@@ -20,3 +20,7 @@ Decode: ["go", "neet"]
 **Target:** O(total length) both ways. The design lesson: put the length
 in front (out-of-band framing) instead of searching the data for a marker
 (in-band signalling).
+
+### Result
+Complete. Took 27:20:75. had some snags but yeah.
+The go compiler is telling me that doing string += string in a loop is inefficeint. What other way exists?

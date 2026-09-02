@@ -18,3 +18,6 @@ Output: [0, 1]        (3 + 4 = 7)
 
 **Target:** O(n) time, one pass — map from value to index, check the
 complement before inserting.
+
+### result
+forgot to time myself. but i swear it felt lesser or equal to 01 so let's say 4 mins.

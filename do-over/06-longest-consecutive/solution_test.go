@@ -14,6 +14,7 @@ func TestLongestConsecutive(t *testing.T) {
 		{[]int{0, -1, -2, 5}, 3},
 		{[]int{1, 2, 0, 1}, 3},
 		{[]int{5, 5, 5}, 1},
+		{[]int{1, 2, 3, 10, 11, 13, 14, 15}, 3},
 	}
 	for _, c := range cases {
 		if got := longestConsecutive(c.nums); got != c.want {

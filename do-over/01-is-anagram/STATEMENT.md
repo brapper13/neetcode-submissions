@@ -21,3 +21,7 @@ Output: false
 
 **Target:** O(n) time. The lowercase-only constraint is what allows a
 `[26]int` counter instead of a map.
+
+### Result
+format - min:sec:msec
+29/08/2026: passed. 4:15:06

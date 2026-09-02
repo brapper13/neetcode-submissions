@@ -19,3 +19,8 @@ Output: 4        (the run 2, 3, 4, 5)
 
 **Target:** O(n) — build a set, iterate the set (not the input), only walk
 upward from numbers that start a run (`num-1` absent from the set).
+
+### Complete
+Result: 09:21:09
+1. Remember to iterate over the set at the end otherwise duplicates becomes an issue
+2. if seqLength >= longest, not just greater than.
