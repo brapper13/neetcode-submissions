@@ -56,10 +56,52 @@ use them.
 
 ## Building strings without quadratic copies
 
-`out += piece` in a loop reallocates and copies the whole string every
-iteration — O(n²) total. `strings.Builder` keeps one growable buffer, so
-appending is amortised O(1). Build with `WriteString` and `WriteByte`,
-call `String()` once at the end.
+### Why `+=` in a loop is quadratic
+
+Strings are immutable, so `out += piece` can never append in place.
+There is no spare room after `out`'s bytes, and even if there were,
+writing into them would mutate a string someone else may share.
+
+So every `+=` does the same three steps. Allocate a fresh array big
+enough for both parts. Copy all of `out` into it. Copy `piece` after it.
+The old array becomes garbage.
+
+The copy of `piece` is fine — you pay that once per piece no matter
+what. The killer is the copy of `out`, because `out` gets longer every
+iteration. With n pieces of similar size, iteration 1 recopies 1 piece
+worth of bytes, iteration 2 recopies 2, iteration 3 recopies 3. The
+total is 1 + 2 + ... + n, which is n(n+1)/2 — O(n²). Joining 10,000
+pieces of 10 bytes recopies about 500 MB to build a 100 KB string.
+
+The bytes you copied in iteration k are thrown away in iteration k+1.
+Almost all the work is copying data that is about to become garbage.
+
+There is a second, smaller cost: n heap allocations and n dead arrays.
+Each allocation takes time, and the dead arrays are work for the
+garbage collector. Same lesson as the Group Anagrams slowdown — the
+expensive thing in a hot loop is usually allocation, not function calls.
+
+### How Builder avoids it
+
+`strings.Builder` keeps one growable `[]byte` buffer with spare capacity
+at the end. `WriteString` usually just copies the new piece into the
+spare room — no allocation, nothing recopied.
+
+When the buffer does fill up, it grows by roughly doubling. Doubling
+means a piece can only be recopied when the buffer size crosses a power
+of two, so each byte moves O(1) times on average instead of once per
+remaining iteration. Total work for n pieces: O(n) bytes copied, and
+only ~log n allocations. That's what "amortised O(1) append" means —
+individual writes occasionally pay for a grow, but the average is
+constant.
+
+`String()` at the end hands you the buffer as a string without copying
+it. This is safe only because Builder refuses to be copied and never
+reuses the buffer afterwards — the immutability promise holds.
+
+Build with `WriteString` and `WriteByte`, call `String()` once at the
+end. (`bytes.Buffer` and appending to a `[]byte` work the same way;
+Builder is just the string-shaped one.)
 
 `*strings.Builder` implements `io.Writer` (it has a
 `Write([]byte) (int, error)` method). That is why `fmt.Fprintf(&sb, ...)`
