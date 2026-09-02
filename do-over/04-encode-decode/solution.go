@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"strconv"
+	"strings"
 )
 
 type Solution struct{}
@@ -11,13 +11,20 @@ func (s *Solution) Encode(strs []string) string {
 	// your solution
 	// to distinuguish between strings we need a delimiter.
 	// we need to add length of string so that we know how many characters to read after the delimiter.
-	var output string
+	var output strings.Builder
 	for _, str := range strs {
-		delimiter := fmt.Sprintf("%d#", len(str))
-		output += fmt.Sprintf("%s%s", delimiter, str)
+		output.WriteString(strconv.Itoa(len(str)))
+		output.WriteByte('#')
+		output.WriteString(str)
+		// Using string += string in a loop is expensive.
+		// Using writeString with sprintf is expensive.
+		// delimiter := fmt.Sprintf("%d#", len(str))
+		// output += fmt.Sprintf("%s%s", delimiter, str)
+		// or
+		// output.WriteString(fmt.Sprintf("%s%s", delimiter, str))
 	}
 	// apparently doing string += string in a loop is inefficient.
-	return output
+	return output.String()
 }
 
 func (s *Solution) Decode(encoded string) []string {
