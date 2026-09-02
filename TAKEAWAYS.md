@@ -140,6 +140,28 @@ Seen in:
 
 Related background: [go-notes/strings.md](go-notes/strings.md).
 
+### 18. Make duplicates impossible to construct instead of filtering them out
+
+When a search generates the same result by several routes, the instinct
+is to filter the output — canonicalise, keep a seen-set, compare. Try
+the other direction first: impose a convention on the search so each
+result has exactly one discovery path. In 3Sum, sorting and requiring
+the anchor to be a triplet's leftmost element removed cross-anchor
+duplicates by construction — no set, no guards, nothing to clean up.
+Filtering treats duplicates as inevitable. A generation constraint makes
+them unrepresentable.
+
+Seen in:
+- **[3Sum](Data%20Structures%20&%20Algorithms/three-integer-sum/STATEMENT.md)** — all unique
+  zero-sum triplets. The full wrong-turns-first walkthrough is in
+  [the NOTES](Data%20Structures%20&%20Algorithms/three-integer-sum/NOTES.md);
+  the final form is
+  [three-integer-sum/submission-5.go](Data%20Structures%20&%20Algorithms/three-integer-sum/submission-5.go).
+
+Related background: [go-notes/map-keys.md](go-notes/map-keys.md) — the
+filtering route needs a set keyed by `[3]int`, which is legal precisely
+because arrays are comparable.
+
 ## Go semantics
 
 ### 7. Comma-ok when zero could be real data, direct indexing when it cannot
@@ -275,3 +297,9 @@ Seen in:
   bug was the loop bound at
   [is-palindrome/submission-11.go, line 8](Data%20Structures%20&%20Algorithms/is-palindrome/submission-11.go#L8);
   the story is in [the NOTES](Data%20Structures%20&%20Algorithms/is-palindrome/NOTES.md).
+- **[3Sum](Data%20Structures%20&%20Algorithms/three-integer-sum/STATEMENT.md)** — submission-3 was
+  accepted while `threeSum([]int{0, 0, 0, 0, 5})` panics with an
+  index-out-of-range: the k-skip loop had no lower bound
+  ([three-integer-sum/submission-3.go, line 25](Data%20Structures%20&%20Algorithms/three-integer-sum/submission-3.go#L25)).
+  Caught by fuzzing against a brute-force reference — the judge never
+  runs a long equal-value prefix.
