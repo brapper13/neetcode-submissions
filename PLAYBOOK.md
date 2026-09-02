@@ -21,6 +21,9 @@ Use a set. A `map[T]bool` set can be read with plain `if set[x]`, because a
 stored `false` never exists — the zero value always means absent. If the map
 stores real data (an index, a count), a stored 0 is legitimate, so read with
 `v, ok := m[k]` instead. ([Takeaway 7](TAKEAWAYS.md#7-comma-ok-when-zero-could-be-real-data-direct-indexing-when-it-cannot).)
+The deeper question — what to hash, and when a map is the wrong tool
+entirely — is worked through problem by problem in
+[patterns/arrays-and-hashing.md](patterns/arrays-and-hashing.md).
 
 **"Count occurrences of each thing."**
 A map counter by default. When the things come from a small bounded range
