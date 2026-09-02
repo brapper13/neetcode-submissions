@@ -57,6 +57,13 @@ the exit condition is `i < j`, never a precomputed midpoint —
 ([takeaway 17](TAKEAWAYS.md#17-an-accepted-submission-is-not-a-correct-program)
 is what happens otherwise).
 
+The mirrored-positions form checks every pair. The *converging search*
+form skips pairs, and skipping needs a proof that the skipped pairs
+cannot win — supplied by something monotone: sort order, a shrinking
+width, a growing running max. When no such proof exists (Two Sum
+unsorted), pay with a hashmap instead. The full argument with all five
+block problems is in [patterns/two-pointers.md](patterns/two-pointers.md).
+
 **"Pack arbitrary data into one string and get it back exactly."**
 Write each piece's length in front of it, and read lengths at known
 positions when decoding. Never search the data for a marker — the data can
