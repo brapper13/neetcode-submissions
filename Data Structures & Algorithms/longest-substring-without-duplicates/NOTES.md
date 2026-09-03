@@ -37,6 +37,40 @@ max. One path through the loop. Fuzz-verified against brute force on
 8,000 random strings over a 4-letter alphabet (small alphabet =
 maximum duplicate pressure) plus `"abba"`, `"dvdf"`, `"tmmzuxt"`.
 
+## What each failed attempt died of (takeaway 14)
+
+Recovered after the fact — the failures were pasted back for autopsy.
+
+- **Attempt 1:** the jump branch paid none of its bookkeeping debts —
+  no index recorded, count ignored `left`, no max update.
+- **Attempt 2:** stale branch added; count off by one
+  (`idx - left`, missing the `+1`); jump branch still not recording
+  the index.
+- **Attempt 3:** off-by-one fixed. The unrecorded index now acts
+  alone: on `"aabaa"` the map points at a pre-jump occurrence, the
+  next duplicate is misclassified as stale, and a window with two
+  `a`s gets counted. The defensive stale branch became the vehicle
+  for the wrong answer.
+- **Attempt 4:** index recording fixed — and the count regressed,
+  moved above the `left` update and minus its `+1` again. Fixing one
+  piece of redundant state destabilised another.
+- **Attempt 5:** byte-identical resubmit of attempt 4. A burned
+  attempt. New checklist item: when a fix fails, diff against the
+  previous paste before submitting again.
+- **Attempts 7–8 (after the first acceptance, during the collapse):**
+  `currSeq` deleted, branches merged — but the max update stayed
+  *inside* the fresh branch. Any window whose best extent ends on a
+  duplicate character is never measured. The fuzzer kills it with
+  `"abbdcacabb"` (returns 3, truth 4); `"tmmzuxt"` is the classic
+  form of the same shape. Fixed in submission 9 by making the max
+  check unconditional, outside all branches: score the window every
+  iteration, no exceptions.
+
+Seven failures, zero algorithm errors. The `abba` guard was correct
+before any code existed. Every death was bookkeeping placement —
+which branch owes which update — and the final form wins by having
+one branch and an unconditional score, so the question cannot arise.
+
 ## Remaining polish (not resubmitted)
 
 - Both branches end in `seen[char] = idx`, so the assignment hoists
