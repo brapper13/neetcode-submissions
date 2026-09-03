@@ -61,11 +61,42 @@ None of this was worth a resubmit.
 - Two blank lines sit before the closing brace. gofmt would remove
   them.
 
-## Owed: the O(1)-space version
+## The O(1)-space version (submission 1)
 
-The two arrays exist only to answer `min(maxLeft, maxRight)` at each
-position. The two-pointer version drops them. Keep one running max per
-side, and resolve whichever side currently has the smaller max — that
-side's `min` is already certain, because the other side guarantees a
-wall at least as tall. Do this as a redo once the O(n) version has
-settled.
+Done the next day, derived rather than looked up, from three guided
+questions. Fuzz-verified against the same brute-force reference.
+
+The derivation in full, because it is the defensible part.
+
+The two arrays in submission 0 exist only to answer
+`min(maxLeft(k), maxRight(k))`. With pointers at both ends carrying
+running maxes, standing at position `i` you know `maxLeft(i)` exactly
+(that side is fully scanned) but only a *lower bound* on
+`maxRight(i)` — the unscanned middle could raise it. A lower bound on
+one argument of `min` is enough exactly when the other argument is
+smaller. So when `maxL <= maxR`, position `i`'s water is certain:
+`maxL - height[i]`. Pay it and move `i`. Symmetric on the other side.
+
+In the primer's language: the running maxes are the monotone
+quantities (they only grow), and the proof of safe skipping is that a
+growing lower bound can never fall below a value it already exceeds.
+
+**The meeting cell needs no payment.** The loop pays each cell as a
+pointer leaves it, so the one cell where the pointers meet is never
+paid. That is safe because the meeting cell is always a global
+maximum. A pointer only stalls on a cell that beats the other side's
+running max. If anything taller sat in the walker's remaining
+territory, the walker's max would overtake and the roles would flip —
+so neither pointer can be parked on less than the tallest bar when
+the other arrives. For a global maximum both inclusive side-maxes
+equal its own height, and the water formula gives exactly 0.
+
+Polish on submission 1:
+
+- The two branches are guarded by complementary `if`s instead of
+  `if/else`. It works only because neither branch touches the maxes;
+  an edit inside the first branch could make both fire in one
+  iteration. `else` states the exclusivity instead of re-deriving it
+  (takeaway 3).
+- Same empty-array panic as submission 0, same verdict: guaranteed
+  away by the constraints, worth saying aloud.
