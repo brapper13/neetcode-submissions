@@ -92,8 +92,23 @@ the final size is the historical maximum: delete `maxSeq` and its
 `if`, not a `while` — the one-step creep is what makes the sizes
 monotone.
 
-## Open items
+## Submissions 5 and 6 — the exercises, done
 
-- The comment block still carries the abandoned "at most k different
-  characters" model — a stale comment lying above correct code.
-  Delete on next touch.
+**Submission 5** applies the removal: `maxSeq` and its `if` deleted,
+`return len(s) - left`, and the stale wrong comment removed with it.
+Fuzz-verified.
+
+**Submission 6** is the fixed-target alternative: for each of the 26
+letters, one pass finding the longest window with at most k non-`c`
+characters. The window state is a single `bad` counter — fixing the
+target letter deletes the maxFreq machinery entirely, which makes this
+version trivial to prove correct on the spot. The non-shrinking trick
+composes into each pass: `len(s) - left` per letter, best of 26.
+O(26n). Fuzz-verified.
+
+Ranking for interviews: submission 5 is the fastest and hardest to
+justify; submission 6 is barely slower and self-evident. Offer 6 if an
+interviewer looks skeptical of the historical-maxFreq argument.
+
+Toolchain note: `for i := range 26` compiled on NeetCode — their Go is
+at least 1.22.
