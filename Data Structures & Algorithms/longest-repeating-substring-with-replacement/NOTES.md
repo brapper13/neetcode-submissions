@@ -54,17 +54,46 @@ every departing character must decrement its count on the way out.
 The deciding question: what does the window have to undo when
 something leaves? Nothing → you may jump. Per-element state → creep.
 
-## The maxFreq subtlety
+## The maxFreq subtlety — resolved
 
 The shrink step lowers a count but never lowers `maxFreq`, so
-`maxFreq` can overstate the window's true max frequency and the
-validity check turns lenient. The answer is still correct — the
-argument is recorded here after being worked through, see the
-conversation-notes section below.
+`maxFreq` can overstate the current window's true max frequency and
+the validity check turns lenient. The answer is still correct.
+
+The reframe (found independently): `maxFreq` is a misnomer. The
+counts are exact for the current window, but `maxFreq` is really "the
+best frequency any window has contained so far" — a historical
+maximum, just like the answer variable itself. The check was never
+"this window against its own max frequency"; it is "this window's
+size against the best certified size so far". Two pillars make that
+legitimate:
+
+**It cannot miss the best window.** A sub-window of a valid window is
+valid: removing a character drops length by 1 and top frequency by at
+most 1, so cost never rises. While the right edge sweeps the optimal
+window with the left edge at or before its start, the true cost is
+therefore ≤ k, and the lenient check passes even more easily. The
+repair can never fire there, so the left edge cannot creep past the
+optimal window's start, and the window reaches the optimal size.
+
+**It cannot invent a size no valid window has.** A new larger size S
+is only recorded when `S - maxFreq <= k`, so `S <= M + k`, where M
+was — at the moment it was set — a genuine count: M copies of one
+character actually present together. M identical characters plus k
+replacements is the recipe for a real valid window of size M + k.
+Every size the stale check waves through is achieved by some valid
+window.
+
+**The same fact removes the scoring `if`.** Each iteration the window
+size grows by one (no repair) or stays flat (repair — the creep is
+exactly one step). The size sequence is monotone non-decreasing, so
+the final size is the historical maximum: delete `maxSeq` and its
+`if`, and `return len(s) - left`. This depends on the repair being an
+`if`, not a `while` — the one-step creep is what makes the sizes
+monotone.
 
 ## Open items
 
 - The comment block still carries the abandoned "at most k different
   characters" model — a stale comment lying above correct code.
   Delete on next touch.
-- The maxFreq argument (above) to be written up once answered.
