@@ -1,6 +1,6 @@
 func trap(height []int) int {
 	// interesting problem. The amount of water that can be trapped between
-	// bars is - 
+	// bars is -
 	// a. starts from the first bar.
 	// b. from the end, it starts from the first descending bar
 	// okay another solution,
@@ -17,7 +17,7 @@ func trap(height []int) int {
 	}
 	maxRight := make([]int, len(height))
 	maxRight[len(height)-1] = height[len(height)-1]
-	for idx := len(height)-2; idx >= 0; idx-- {
+	for idx := len(height) - 2; idx >= 0; idx-- {
 		if height[idx] > maxRight[idx+1] {
 			maxRight[idx] = height[idx]
 			continue
@@ -31,6 +31,4 @@ func trap(height []int) int {
 		totalWater += min(maxLeft[idx], maxRight[idx]) - height[idx]
 	}
 	return totalWater
-
-
 }
